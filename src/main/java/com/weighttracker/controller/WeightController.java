@@ -1,13 +1,18 @@
 package com.weighttracker.controller;
 
-import com.weighttracker.entity.WeightRecord;
-import com.weighttracker.service.WeightService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import com.weighttracker.entity.WeightRecord;
+import com.weighttracker.service.WeightService;
 
 @Controller
 @RequestMapping("/")  // ベースURLを明示的に指定
@@ -19,7 +24,7 @@ public class WeightController {
     // ホームページを表示
     @GetMapping
     public String home(Model model) {
-        // 仮のユーザーID（実際にはログイン機能と連携する）
+        // 仮のユーザーID
         Integer userId = 1;
         
         // ユーザーの体重記録を取得

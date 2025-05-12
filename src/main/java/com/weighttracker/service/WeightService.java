@@ -22,7 +22,7 @@ public class WeightService {
     
     // ユーザーの体重記録を取得
     public List<WeightRecord> getWeightRecordsByUserId(Integer userId) {
-        return weightRecordRepository.findByUserIdOrderByRecordedDateDesc(userId);
+        return weightRecordRepository.findByUserIdOrderByTimestampDesc(userId);
     }
     
     // ユーザーの平均体重を計算

@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 
@@ -20,6 +21,7 @@ public class WeightRecord {
     private Integer userId;
     private Double weight;
     private LocalDate recordedDate;
+    private LocalDateTime timestamp;
     
     // コンストラクタ
     public WeightRecord() {
@@ -29,6 +31,7 @@ public class WeightRecord {
         this.userId = userId;
         this.weight = weight;
         this.recordedDate = recordedDate;
+        this.timestamp = LocalDateTime.now();
     }
     
     // ゲッターとセッター
@@ -62,5 +65,13 @@ public class WeightRecord {
 
     public void setRecordedDate(LocalDate recordedDate) {
         this.recordedDate = recordedDate;
+    }
+    
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+    
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 }

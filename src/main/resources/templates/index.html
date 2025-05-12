@@ -1,108 +1,392 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>体重管理アプリ</title>
+    <title>体重管理ダッシュボード | ウェイトトラッカー</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        body {
-            padding-top: 2rem;
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #1abc9c;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
         }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding-top: 56px;
+        }
+
+        .navbar {
+            background-color: var(--secondary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .nav-link.active {
+            color: white !important;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
         .rank-badge {
             font-size: 2rem;
-            display: inline-block;
-            width: 60px;
-            height: 60px;
-            line-height: 60px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             text-align: center;
             color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
         .rank-A {
-            background-color: #28a745;
+            background-color: var(--success-color);
         }
+
         .rank-B {
-            background-color: #ffc107;
+            background-color: var(--warning-color);
         }
+
         .rank-C {
-            background-color: #dc3545;
+            background-color: var(--danger-color);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .weight-table th {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .weight-form {
+            background-color: rgba(26, 188, 156, 0.05);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+
+        .page-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="mb-4">体重管理アプリ</h1>
-        
-        <!-- 現在の状態表示 -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h3>現在の状態</h3>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="mb-2">直近の体重:</div>
-                        <h2 th:if="${latestWeight}" th:text="${latestWeight} + ' kg'">70.0 kg</h2>
-                        <h2 th:unless="${latestWeight}">未記録</h2>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-weight me-2"></i>ウェイトトラッカー
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home me-1"></i>ホーム
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chart">
+                            <i class="fas fa-chart-line me-1"></i>グラフ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history">
+                            <i class="fas fa-history me-1"></i>履歴
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings">
+                            <i class="fas fa-cog me-1"></i>設定
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ダッシュボードヘッダー -->
+    <header class="dashboard-header">
+        <div class="container">
+            <h1 class="display-5 fw-bold"><i class="fas fa-tachometer-alt me-2"></i>ダッシュボード</h1>
+            <p class="lead">あなたの体重管理をサポートします</p>
+        </div>
+    </header>
+
+    <div class="container page-transition">
+        <!-- メインコンテンツ -->
+        <div class="row mb-4">
+            <!-- 状態カード -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-weight me-2"></i>現在の状態</h5>
                     </div>
-                    <div class="col-md-4">
-                        <div class="mb-2">平均体重:</div>
-                        <h2 th:if="${averageWeight}" th:text="${#numbers.formatDecimal(averageWeight, 1, 1)} + ' kg'">70.0 kg</h2>
-                        <h2 th:unless="${averageWeight}">データなし</h2>
+                    <div class="card-body stat-card">
+                        <div th:if="${latestWeight}" class="stat-value" th:text="${latestWeight} + ' kg'">70.0 kg</div>
+                        <div th:unless="${latestWeight}" class="stat-value text-muted">-- kg</div>
+                        <div class="stat-label">最新の体重</div>
+
+                        <div th:if="${rank}" class="my-4">
+                            <div class="rank-badge" th:class="'rank-badge rank-' + ${rank}" th:text="${rank}">A</div>
+                            <div class="mt-2 text-muted">現在のランク</div>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="mb-2">評価:</div>
-                        <div th:if="${rank}" class="rank-badge" th:class="'rank-badge rank-' + ${rank}" th:text="${rank}">A</div>
-                        <h2 th:unless="${rank}">-</h2>
+                </div>
+            </div>
+
+            <!-- 平均体重カード -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>平均データ</h5>
+                    </div>
+                    <div class="card-body stat-card">
+                        <div th:if="${averageWeight}" class="stat-value"
+                            th:text="${#numbers.formatDecimal(averageWeight, 1, 1)} + ' kg'">70.0 kg</div>
+                        <div th:unless="${averageWeight}" class="stat-value text-muted">-- kg</div>
+                        <div class="stat-label">平均体重</div>
+
+                        <div class="mt-4" th:if="${averageWeight != null && latestWeight != null}">
+                            <div class="stat-value" th:with="diff=${latestWeight - averageWeight}"
+                                th:text="(${diff} >= 0 ? '+' : '') + ${#numbers.formatDecimal(diff, 1, 1)} + ' kg'"
+                                th:style="'color: ' + (${diff} > 0 ? 'var(--danger-color)' : (${diff} < 0 ? 'var(--success-color)' : 'inherit'))">
+                                +0.5 kg
+                            </div>
+                            <div class="stat-label">平均との差</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- クイック入力カード -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>体重を記録</h5>
+                    </div>
+                    <div class="card-body weight-form">
+                        <form th:action="@{/add}" method="post" class="py-2">
+                            <div class="mb-3">
+                                <label for="weight" class="form-label">今日の体重 (kg)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control form-control-lg" id="weight" name="weight"
+                                        placeholder="例: 70.5" step="0.1" min="30" max="300" required>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save me-2"></i>記録する
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 体重記録フォーム -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h3>体重を記録</h3>
-                <form th:action="@{/add}" method="post" class="row g-3">
-    <div class="col-auto">
-        <input type="number" class="form-control" name="weight" placeholder="体重 (kg)" step="0.1" required>
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">記録する</button>
-    </div>
-</form>
-            </div>
-        </div>
-        
+
         <!-- 体重履歴 -->
         <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>最近の記録</h5>
+                <a href="/history" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-search me-1"></i>すべて表示
+                </a>
+            </div>
             <div class="card-body">
-                <h3>体重履歴</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>日付</th>
-                            <th>体重 (kg)</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="record : ${weightRecords}">
-                            <td th:text="${record.recordedDate}">2025-05-01</td>
-                            <td th:text="${record.weight}">70.0</td>
-                            <td>
-                                <a th:href="@{/delete/{id}(id=${record.id})}" class="btn btn-sm btn-danger"
-                                   onclick="return confirm('本当に削除しますか？')">削除</a>
-                            </td>
-                        </tr>
-                        <tr th:if="${weightRecords == null || weightRecords.isEmpty()}">
-                            <td colspan="3" class="text-center">記録がありません</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover weight-table">
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>体重 (kg)</th>
+                                <th>平均との差</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="record, stat : ${weightRecords}" th:if="${stat.index < 5}">
+                                <td>
+                                    <a th:href="@{/details/{id}(id=${record.id})}" class="text-decoration-none">
+                                        <strong th:text="${record.recordedDate}">2025-05-01</strong>
+                                    </a>
+                                </td>
+                                <td th:text="${record.weight} + ' kg'">70.0 kg</td>
+                                <td th:if="${averageWeight != null}">
+                                    <span th:with="diff=${record.weight - averageWeight}"
+                                        th:text="(${diff} >= 0 ? '+' : '') + ${#numbers.formatDecimal(diff, 1, 1)} + ' kg'"
+                                        th:class="'badge ' + (${diff > 1.0} ? 'bg-danger' : (${diff < -1.0} ? 'bg-success' : (${diff > 0.5 || diff < -0.5} ? 'bg-warning text-dark' : 'bg-info text-dark')))">
+                                        +0.5 kg
+                                    </span>
+                                </td>
+                                <td th:unless="${averageWeight != null}">--</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/details/{id}(id=${record.id})}" class="btn btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/delete/{id}(id=${record.id})}" class="btn btn-outline-danger"
+                                            onclick="return confirm('この記録を削除してもよろしいですか？')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${weightRecords == null || weightRecords.isEmpty()}">
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-info-circle me-2"></i>記録がありません
+                                    </div>
+                                    <small>右上の「体重を記録」から最初の記録を追加しましょう</small>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3" th:if="${weightRecords != null && weightRecords.size() > 5}">
+                    <a href="/history" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-1"></i>すべての記録を見る (全 <span th:text="${weightRecords.size()}">20</span>
+                        件)
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- フッター -->
+    <footer class="mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-weight me-2"></i>ウェイトトラッカー</h5>
+                    <p class="small">あなたの健康をサポートする体重管理アプリ</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="small">© 2025 Weight Tracker App. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 簡単なページ遷移エフェクト
+        document.addEventListener('DOMContentLoaded', () => {
+            const pageContent = document.querySelector('.page-transition');
+            pageContent.style.opacity = '0';
+
+            setTimeout(() => {
+                pageContent.style.opacity = '1';
+            }, 100);
+
+            // ナビゲーションリンクにクリックイベントを追加
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // 実際のリンクは有効（この例では preventDefault は使わない）
+                    // ただし遷移前にフェードアウト効果を追加
+                    pageContent.style.opacity = '0';
+                });
+            });
+        });
+    </script>
 </body>
+
 </html>
