@@ -53,4 +53,9 @@ public class WeightService {
     public void deleteWeightRecord(Long id) {
         weightRecordRepository.deleteById(id);
     }
+    // ID に基づいて体重記録を取得
+public WeightRecord getWeightRecordById(Long id) {
+    return weightRecordRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("指定されたIDの記録が見つかりません: " + id));
+}
 }

@@ -46,6 +46,67 @@ public class WeightController {
         return "index";
     }
     
+    // グラフページを表示
+    @GetMapping("/chart")
+    public String showChart(Model model) {
+        // 仮のユーザーID
+        Integer userId = 1;
+        
+        // ユーザーの体重記録を取得
+        List<WeightRecord> records = weightService.getWeightRecordsByUserId(userId);
+        model.addAttribute("weightRecords", records);
+        
+        // 平均体重を計算
+        Double averageWeight = weightService.calculateAverageWeight(userId);
+        model.addAttribute("averageWeight", averageWeight);
+        
+        return "chart";
+    }
+    
+    // 履歴ページを表示
+    @GetMapping("/history")
+    public String showHistory(Model model) {
+        // 仮のユーザーID
+        Integer userId = 1;
+        
+        // ユーザーの体重記録を取得
+        List<WeightRecord> records = weightService.getWeightRecordsByUserId(userId);
+        model.addAttribute("weightRecords", records);
+        
+        // 平均体重を計算
+        Double averageWeight = weightService.calculateAverageWeight(userId);
+        model.addAttribute("averageWeight", averageWeight);
+        
+        return "history";
+    }
+    
+    // 設定ページを表示
+    @GetMapping("/settings")
+    public String showSettings(Model model) {
+        return "settings";
+    }
+    
+    // 詳細ページを表示
+    @GetMapping("/details/{id}")
+    public String showDetails(@PathVariable("id") Long id, Model model) {
+        // 体重記録の詳細を取得
+        WeightRecord record = weightService.getWeightRecordById(id);
+        model.addAttribute("weightRecord", record);
+        
+        // 仮のユーザーID
+        Integer userId = 1;
+        
+        // 平均体重を計算
+        Double averageWeight = weightService.calculateAverageWeight(userId);
+        model.addAttribute("averageWeight", averageWeight);
+        
+        // ランクを評価
+        String rank = weightService.evaluateWeight(record.getWeight(), averageWeight);
+        model.addAttribute("rank", rank);
+        
+        return "details";
+    }
+    
     // 新しい体重記録を追加
     @PostMapping("/add")
     public String addWeight(@RequestParam("weight") Double weight) {
