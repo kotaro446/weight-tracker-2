@@ -261,7 +261,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
         // ページ遷移エフェクト
         document.addEventListener('DOMContentLoaded', () => {
             const pageContent = document.querySelector('.page-transition');
@@ -275,87 +275,20 @@
             if (document.getElementById('weightChart')) {
                 const ctx = document.getElementById('weightChart').getContext('2d');
 
-                // Thymeleafからのデータを取得
-                const dates = /*[[${weightRecords.![recordedDate]}]]*/['2025-05-01', '2025-05-02', '2025-05-03'];
-                const weights = /*[[${weightRecords.![weight]}]]*/[70.5, 70.2, 70.0];
-                const averageWeight = /*[[${averageWeight}]]*/ 70.2;
-
-                const chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dates,
-                        datasets: [{
-                            label: '体重 (kg)',
-                            data: weights,
-                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            borderWidth: 2,
-                            pointBackgroundColor: 'rgba(52, 152, 219, 1)',
-                            pointBorderColor: '#fff',
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                            tension: 0.1
-                        }, {
-                            label: '平均体重',
-                            data: Array(dates.length).fill(averageWeight),
-                            borderColor: 'rgba(231, 76, 60, 0.7)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                title: {
-                                    display: true,
-                                    text: '体重 (kg)'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: '日付'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        });
-    </script>
-
-    <script th:inline="javascript">
-        // Thymeleafからのデータを使用してグラフを描画
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('weightChart')) {
-                const ctx = document.getElementById('weightChart').getContext('2d');
-
+                // Thymeleafからデータを適切に取得
                 const weightRecords = /*[[${weightRecords}]]*/[];
+                const averageWeight = /*[[${averageWeight}]]*/ null;
+
+                // データ処理
                 if (weightRecords && weightRecords.length > 0) {
-                    const dates = [];
-                    const weights = [];
+                    // 日付を新しい順から古い順に並べ替え（チャート表示用）
+                    const recordsForChart = [...weightRecords].reverse();
 
-                    weightRecords.forEach(record => {
-                        dates.push(record.recordedDate);
-                        weights.push(record.weight);
-                    });
+                    // 日付と体重のデータを抽出
+                    const dates = recordsForChart.map(record => record.recordedDate);
+                    const weights = recordsForChart.map(record => record.weight);
 
-                    const averageWeight = /*[[${averageWeight}]]*/ null;
-
+                    // チャートを作成
                     const chart = new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -410,10 +343,16 @@
                             }
                         }
                     });
+                } else {
+                    // データがない場合の表示
+                    document.querySelector('.chart-container').innerHTML = `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-chart-line fa-3x mb-3"></i>
+                            <h5>データがありません</h5>
+                            <p>体重を記録すると、ここにグラフが表示されます。</p>
+                        </div>
+                    `;
                 }
             }
         });
     </script>
-</body>
-
-</html>
